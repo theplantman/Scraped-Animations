@@ -5,6 +5,12 @@ local Scraped = {}
 if isfile(game.PlaceId .. "_Scraped.json") then
     Scraped = game.HttpService:JSONDecode(readfile(game.PlaceId .. "_Scraped.json"))
 end
+local NumberOfScraped = 0
+local NumberOfOldScraped = 0
+for Index, AnimationId in pairs(Scraped) do
+    NumberOfScraped += 1
+    NumberOfOldScraped += 1
+end
 function InsertAnimation(Animation)
     if Animation then
         local function CheckIfScraped(AnimationId)
@@ -17,6 +23,7 @@ function InsertAnimation(Animation)
         if not CheckIfScraped(Animation.AnimationId) and tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)) and tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)) ~= 0 then
             local AssetName = game.MarketplaceService:GetProductInfo(tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)))["Name"]
             if AssetName then
+                NumberOfScraped += 1
                 Scraped[AssetName] = Animation.AnimationId
             end
         end
@@ -34,4 +41,6 @@ for Index, Player in pairs(game.Players:GetPlayers()) do
         end
     end
 end
-writefile(game.PlaceId .. "_Scraped.json", game.HttpService:JSONEncode(Scraped))
+if NumberOfScraped > NumberOfOldScraped then
+    writefile(game.PlaceId .. "_Scraped.json", game.HttpService:JSONEncode(Scraped))
+end
