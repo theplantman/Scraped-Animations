@@ -2,8 +2,8 @@ repeat
     task.wait()
 until game:IsLoaded()
 local Scraped = {}
-if isfile(tostring(game.PlaceId) .. "_Scraped.json") then
-    Scraped = game.HttpService:JSONDecode(readfile(tostring(game.PlaceId) .. "_Scraped.json"))
+if isfile(game.PlaceId .. "_Scraped.json") then
+    Scraped = game.HttpService:JSONDecode(readfile(game.PlaceId .. "_Scraped.json"))
 end
 function CheckIfScraped(AnimationId)
     for Index, ScrapedAnimationId in pairs(Scraped) do
@@ -20,4 +20,4 @@ for Index, Animation in pairs(game:GetDescendants()) do
         end
     end
 end
-writefile(tostring(game.PlaceId) .. "_Scraped.json", game.HttpService:JSONEncode(Scraped))
+writefile(game.PlaceId .. "_Scraped.json", game.HttpService:JSONEncode(Scraped))
