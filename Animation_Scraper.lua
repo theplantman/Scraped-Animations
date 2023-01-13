@@ -1,16 +1,10 @@
-repeat
-    task.wait()
-until game:IsLoaded()
-local Scraped = {}
 if isfile(game.PlaceId .. "_Scraped.json") then
     Scraped = game.HttpService:JSONDecode(readfile(game.PlaceId .. "_Scraped.json"))
 end
-local NumberOfScraped = 0
-local NumberOfOldScraped = 0
-for Index, AnimationId in pairs(Scraped) do
-    NumberOfScraped += 1
-    NumberOfOldScraped += 1
-end
+function CheckIfScraped(AnimationId)
+    for Index, ScrapedAnimationId in pairs(Scraped) do
+        if AnimationId == ScrapedAnimationId then
+            return true
 function InsertAnimation(Animation)
     if Animation then
         local function CheckIfScraped(AnimationId)
@@ -20,16 +14,20 @@ function InsertAnimation(Animation)
                 end
             end
         end
+    end
         if not CheckIfScraped(Animation.AnimationId) and tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)) and tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)) ~= 0 then
             local AssetName = game.MarketplaceService:GetProductInfo(tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)))["Name"]
             if AssetName then
-                NumberOfScraped += 1
                 Scraped[AssetName] = Animation.AnimationId
             end
         end
     end 
 end
 for Index, Animation in pairs(game:GetDescendants()) do
+    if Animation.ClassName == "Animation" and not CheckIfScraped(Animation.AnimationId) and tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)) and tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)) ~= 0 then
+        local AssetName = game.MarketplaceService:GetProductInfo(tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)))["Name"]
+        if AssetName then
+            Scraped[AssetName] = Animation.AnimationId
     if Animation.ClassName == "Animation" then
         InsertAnimation(Animation)
     end
@@ -41,6 +39,4 @@ for Index, Player in pairs(game.Players:GetPlayers()) do
         end
     end
 end
-if NumberOfScraped > NumberOfOldScraped then
-    writefile(game.PlaceId .. "_Scraped.json", game.HttpService:JSONEncode(Scraped))
-end
+writefile(game.PlaceId .. "_Scraped.json", game.HttpService:JSONEncode(Scraped))
