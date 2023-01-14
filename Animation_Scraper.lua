@@ -1,10 +1,16 @@
+repeat
+    task.wait()
+until game:IsLoaded()
+local Scraped = {}
 if isfile(game.PlaceId .. "_Scraped.json") then
     Scraped = game.HttpService:JSONDecode(readfile(game.PlaceId .. "_Scraped.json"))
 end
-function CheckIfScraped(AnimationId)
-    for Index, ScrapedAnimationId in pairs(Scraped) do
-        if AnimationId == ScrapedAnimationId then
-            return true
+local ScrapedCount = 0
+local OldScrapedCount = 0
+for Index, AnimationId in pairs(Scraped) do
+    ScrapedCount += 1
+    OldScrapedCount += 1
+end
 function InsertAnimation(Animation)
     if Animation then
         local function CheckIfScraped(AnimationId)
@@ -14,29 +20,24 @@ function InsertAnimation(Animation)
                 end
             end
         end
-    end
         if not CheckIfScraped(Animation.AnimationId) and tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)) and tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)) ~= 0 then
             local AssetName = game.MarketplaceService:GetProductInfo(tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)))["Name"]
-            if AssetName then
+            if AssetName and not Scraped[AssetName] then
+                ScrapedCount += 1
                 Scraped[AssetName] = Animation.AnimationId
             end
         end
     end 
 end
-for Index, Animation in pairs(game:GetDescendants()) do
-    if Animation.ClassName == "Animation" and not CheckIfScraped(Animation.AnimationId) and tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)) and tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)) ~= 0 then
-        local AssetName = game.MarketplaceService:GetProductInfo(tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)))["Name"]
-        if AssetName then
-            Scraped[AssetName] = Animation.AnimationId
-    if Animation.ClassName == "Animation" then
-        InsertAnimation(Animation)
-    end
-end
-for Index, Player in pairs(game.Players:GetPlayers()) do
-    if Player.Character and Player.Character:FindFirstChild("Humanoid") then
-        for Index, AnimationTrack in pairs(Player.Character.Humanoid:GetPlayingAnimationTracks()) do
+for Index, Unknown in pairs(game:GetDescendants()) do
+    if Unknown.ClassName == "Animation" then
+        InsertAnimation(Unknown)
+    elseif Unknown.ClassName == "Humanoid" then
+        for Index, AnimationTrack in pairs(Unknown:GetPlayingAnimationTracks()) do
             InsertAnimation(AnimationTrack.Animation)
         end
     end
 end
-writefile(game.PlaceId .. "_Scraped.json", game.HttpService:JSONEncode(Scraped))
+if ScrapedCount > OldScrapedCount then
+    writefile(game.PlaceId .. "_Scraped.json", game.HttpService:JSONEncode(Scraped))
+end
