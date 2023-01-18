@@ -11,8 +11,6 @@ for Index, AnimationId in pairs(Scraped) do
     ScrapedCount += 1
     OldScrapedCount += 1
 end
-rconsolename(game.PlaceId .. "_Scraped")
-rconsoleprint("@@LIGHT_GREEN@@")
 function InsertAnimation(Animation)
     if Animation then
         local function CheckIfScraped(AnimationId)
@@ -26,7 +24,6 @@ function InsertAnimation(Animation)
             local AssetName = game.MarketplaceService:GetProductInfo(tonumber(Animation.AnimationId:sub(14, #Animation.AnimationId)))["Name"]
             if AssetName and not Scraped[AssetName] then
                 ScrapedCount += 1
-                rconsoleprint(AssetName .. " : " .. Animation.AnimationId .. "\n")
                 Scraped[AssetName] = Animation.AnimationId
             end
         end
